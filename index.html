@@ -97,13 +97,19 @@
 </header>
 
 <div class="nav">
+  <button onclick="showPage('upload')">Upload JSON</button>
   <button onclick="showPage('welcome')">Benvenuto</button>
   <button onclick="showPage('prodotti')">Prodotti</button>
   <button onclick="showPage('carrello')">Carrello</button>
   <button onclick="showPage('scontrino')">Scontrino</button>
 </div>
 
-<div id="welcome" class="page">
+<div id="upload" class="page">
+  <h2>Carica il tuo file JSON</h2>
+  <input type="file" id="fileInput" accept=".json">
+</div>
+
+<div id="welcome" class="page hidden">
   <h2>Benvenuto nel nostro negozio</h2>
   <p>Scopri la selezione esclusiva di smartphone!</p>
 </div>
@@ -129,24 +135,7 @@
 </div>
 
 <script>
-// Dati dei prodotti (inclusi direttamente nel codice JSON)
-const prodotti = [
-  {
-    "marca": "Samsung",
-    "modello": "Galaxy S23",
-    "descrizione": "RAM: 8GB, Memoria: 256GB, Fotocamera: 108MP",
-    "immagine": "https://via.placeholder.com/200x200?text=Samsung+S23",
-    "prezzo": 899
-  },
-  {
-    "marca": "Apple",
-    "modello": "iPhone 14",
-    "descrizione": "RAM: 6GB, Memoria: 128GB, Fotocamera: 48MP",
-    "immagine": "https://via.placeholder.com/200x200?text=iPhone+14",
-    "prezzo": 1099
-  }
-];
-
+let prodotti = [];
 let carrello = [];
 
 function showPage(id) {
@@ -157,6 +146,27 @@ function showPage(id) {
   if (id === 'carrello') renderCarrello();
   if (id === 'scontrino') renderScontrino();
 }
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    try {
+      const json = JSON.parse(event.target.result);
+      if (Array.isArray(json.prodotti)) {
+        prodotti = json.prodotti;
+        alert("Prodotti caricati con successo!");
+        showPage('welcome');
+      } else {
+        alert("Formato JSON non valido.");
+      }
+    } catch {
+      alert("Errore nel file JSON.");
+    }
+  };
+  reader.readAsText(file);
+});
 
 function renderProdotti() {
   const container = document.getElementById('lista-prodotti');
@@ -236,3 +246,4 @@ function renderScontrino() {
 
 </body>
 </html>
+
