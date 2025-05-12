@@ -153,15 +153,13 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
   const reader = new FileReader();
   reader.onload = function(event) {
     try {
-      const json = JSON.parse(event.target.result);
-      if (Array.isArray(json.prodotti)) {
         prodotti = json.prodotti;
         alert("Prodotti caricati con successo!");
         showPage('welcome');
       } else {
         alert("Formato JSON non valido.");
       }
-    } catch {
+   
       alert("Errore nel file JSON.");
     }
   };
