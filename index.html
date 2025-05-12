@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Galva & Boni Telephon</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f2f2f2;
+    }
+    header {
+      background: #1e1e2f;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    h1, h2 {
+      color: #222;
+    }
+    .nav {
+      background: #333;
+      padding: 10px;
+      text-align: center;
+    }
+    .nav button {
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .nav button:hover {
+      background: #666;
+    }
+    .page {
+      padding: 20px;
+    }
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      width: 220px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    button {
+      padding: 8px 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      border: none;
+      background: #1e90ff;
+      color: #fff;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0c6cd4;
+    }
+    .hidden {
+      display: none;
+    }
+    #modal {
+      position: fixed;
+      top: 10%;
+      left: 10%;
+      right: 10%;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      padding: 20px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Galva & Boni Telephon</h1>
+  <p>Il meglio della tecnologia mobile, con stile!</p>
+</header>
+
+<div class="nav">
+  <button onclick="showPage('welcome')">Benvenuto</button>
+  <button onclick="showPage('prodotti')">Prodotti</button>
+  <button onclick="showPage('carrello')">Carrello</button>
+  <button onclick="showPage('scontrino')">Scontrino</button>
+</div>
+
+<div id="welcome" class="page">
+  <h2>Benvenuto nel nostro negozio</h2>
+  <p>Scopri la selezione esclusiva di smartphone!</p>
+</div>
+
+<div id="prodotti" class="page hidden">
+  <h2>Prodotti disponibili</h2>
+  <div id="lista-prodotti" class="grid"></div>
+</div>
+
+<div id="carrello" class="page hidden">
+  <h2>Il tuo carrello</h2>
+  <div id="carrello-contenuto"></div>
+</div>
+
+<div id="scontrino" class="page hidden">
+  <h2>Scontrino</h2>
+  <div id="scontrino-dettagli"></div>
+</div>
+
+<div id="modal" class="hidden">
+  <div id="modal-content"></div>
+  <button onclick="closeModal()">Chiudi</button>
+</div>
+
+<script>
+// Dati dei prodotti (inclusi direttamente nel codice JSON)
+const prodotti = [
+  {
+    "marca": "Samsung",
+    "modello": "Galaxy S23",
+    "descrizione": "RAM: 8GB, Memoria: 256GB, Fotocamera: 108MP",
+    "immagine": "https://via.placeholder.com/200x200?text=Samsung+S23",
+    "prezzo": 899
+  },
+  {
+    "marca": "Apple",
+    "modello": "iPhone 14",
+    "descrizione": "RAM: 6GB, Memoria: 128GB, Fotocamera: 48MP",
+    "immagine": "https://via.placeholder.com/200x200?text=iPhone+14",
+    "prezzo": 1099
+  }
+];
+
+let carrello = [];
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+
+  if (id === 'prodotti') renderProdotti();
+  if (id === 'carrello') renderCarrello();
+  if (id === 'scontrino') renderScontrino();
+}
+
+function renderProdotti() {
+  const container = document.getElementById('lista-prodotti');
+  container.innerHTML = '';
+  prodotti.forEach((p, index) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <img src="${p.immagine}" alt="${p.modello}">
+      <h3>${p.marca} ${p.modello}</h3>
+      <button onclick="mostraDettaglio(${index})">Dettagli</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function mostraDettaglio(index) {
+  const p = prodotti[index];
+  const modal = document.getElementById('modal');
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <img src="${p.immagine}" alt="${p.modello}" style="max-width:200px;">
+    <h2>${p.marca} ${p.modello}</h2>
+    <p>${p.descrizione}</p>
+    <p><strong>Prezzo: €${p.prezzo}</strong></p>
+    <button onclick="aggiungiAlCarrello(${index})">Aggiungi al carrello</button>
+  `;
+  modal.classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+}
+
+function aggiungiAlCarrello(index) {
+  carrello.push(prodotti[index]);
+  closeModal();
+  alert("Prodotto aggiunto al carrello!");
+}
+
+function renderCarrello() {
+  const div = document.getElementById('carrello-contenuto');
+  div.innerHTML = '';
+  if (carrello.length === 0) {
+    div.innerHTML = '<p>Il carrello è vuoto.</p>';
+    return;
+  }
+  carrello.forEach((p, i) => {
+    const item = document.createElement('div');
+    item.innerHTML = `
+      <p>${p.marca} ${p.modello} - €${p.prezzo} <button onclick="rimuoviDalCarrello(${i})">Rimuovi</button></p>
+    `;
+    div.appendChild(item);
+  });
+}
+
+function rimuoviDalCarrello(index) {
+  carrello.splice(index, 1);
+  renderCarrello();
+}
+
+function renderScontrino() {
+  const div = document.getElementById('scontrino-dettagli');
+  div.innerHTML = '';
+  if (carrello.length === 0) {
+    div.innerHTML = '<p>Nessun prodotto acquistato.</p>';
+    return;
+  }
+  let totale = 0;
+  carrello.forEach(p => {
+    div.innerHTML += `<p>${p.marca} ${p.modello} - €${p.prezzo}</p>`;
+    totale += p.prezzo;
+  });
+  div.innerHTML += `<hr><strong>TOTALE: €${totale}</strong>`;
+}
+</script>
+
+</body>
+</html>
